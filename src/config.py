@@ -32,7 +32,7 @@ class Config(object):
         """
         self._basescript = None
         self.recentvaults = []
-        self.pwlength = 12
+        self.pwlength = 10
         self.reduction = False
         self.search_notes = False
         self.search_passwd = False

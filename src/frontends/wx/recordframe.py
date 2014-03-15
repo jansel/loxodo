@@ -192,7 +192,7 @@ class RecordFrame(wx.Dialog):
 
     @staticmethod
     def generate_password(alphabet="abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_",
-                          pwd_length=12, allow_reduction=False, use_pwgen=True):
+                          pwd_length=10, allow_reduction=False, use_pwgen=False):
         if use_pwgen:
             # use pwgen program to generate pronounceable passwords
             options = '-cn'
