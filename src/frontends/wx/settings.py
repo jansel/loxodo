@@ -54,6 +54,8 @@ class Settings(wx.Dialog):
 
         self._tc_alphabet = self._add_a_textcontrol(_sz_fields,_("Alphabet")+ ":",config.alphabet)
 
+        self._cb_tray_icon = self._add_a_checkbox(_sz_fields,_("Tray Icon") + ":")
+
         _ln_line = wx.StaticLine(self.panel, -1, size=(20, -1), style=wx.LI_HORIZONTAL)
         _sz_main.Add(_ln_line, 0, wx.GROW|wx.ALIGN_CENTER_VERTICAL|wx.RIGHT|wx.TOP, 5)
 
@@ -117,6 +119,7 @@ class Settings(wx.Dialog):
         """
         self._sc_length.SetValue(config.pwlength)
         self._tc_alphabet.SetValue(config.alphabet)
+        self._cb_tray_icon.SetValue(config.tray_icon)
         self._cb_reduction.SetValue(config.reduction)
         self._search_notes.SetValue(config.search_notes)
         self._search_passwd.SetValue(config.search_passwd)
@@ -130,6 +133,7 @@ class Settings(wx.Dialog):
         config.search_notes = self._search_notes.GetValue()
         config.search_passwd = self._search_passwd.GetValue()
         config.alphabet = self._tc_alphabet.GetValue()
+        config.tray_icon = self._cb_tray_icon.GetValue()
         config.save()
 
     def _on_cancel(self, dummy):

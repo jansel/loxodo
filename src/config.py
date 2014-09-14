@@ -37,6 +37,7 @@ class Config(object):
         self.search_notes = False
         self.search_passwd = False
         self.alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+        self.tray_icon = False
 
         self._fname = self.get_config_filename()
         self._parser = SafeConfigParser()
@@ -61,6 +62,10 @@ class Config(object):
         if self._parser.has_option("base", "alphabetreduction"):
             if self._parser.get("base", "alphabetreduction") == "True":
                 self.reduction = True
+
+        if self._parser.has_option("base", "tray_icon"):
+            if self._parser.get("base", "tray_icon") == "True":
+                self.tray_icon = True
 
         if self._parser.has_option("base", "search_notes"):
             if self._parser.get("base", "search_notes") == "True":
@@ -95,6 +100,7 @@ class Config(object):
 
         self._parser.set("base", "pwlength", str(self.pwlength))
         self._parser.set("base", "alphabetreduction", str(self.reduction))
+        self._parser.set("base", "tray_icon", str(self.tray_icon))
         self._parser.set("base", "search_notes", str(self.search_notes))
         self._parser.set("base", "search_passwd", str(self.search_passwd))
         filehandle = open(self._fname, 'w')
