@@ -26,6 +26,7 @@ from ...config import config
 from .recordframe import RecordFrame
 from .mergeframe import MergeFrame
 from .settings import Settings
+from .taskbaricon import LoxodoTaskBarIcon
 
 
 class VaultFrame(wx.Frame):
@@ -227,6 +228,14 @@ class VaultFrame(wx.Frame):
         self.vault = None
         self._is_modified = False
 
+        self.icon = wx.Icon(os.path.join(os.path.dirname(os.path.realpath(config.get_basescript())), "resources", "loxodo-icon.png"),
+                            wx.BITMAP_TYPE_PNG, 128, 128)
+
+        if config.tray_icon:
+            self.tray_icon = LoxodoTaskBarIcon(self.icon, "Loxodo", self)
+        else:
+            self.tray_icon = None
+
     def mark_modified(self):
         self._is_modified = True
         if ((self.vault_file_name is not None) and (self.vault_password is not None)):
@@ -359,7 +368,7 @@ if not, write to the Free Software Foundation, Inc.,
                       )
 
         about = wx.AboutDialogInfo()
-        about.SetIcon(wx.Icon(os.path.join(os.path.dirname(os.path.realpath(config.get_basescript())), "resources", "loxodo-icon.png"), wx.BITMAP_TYPE_PNG, 128, 128))
+        about.SetIcon(self.icon)
         about.SetName("Loxodo")
         about.SetVersion("0.0-git")
         about.SetCopyright("Copyright (C) 2008 Christoph Sommer <mail@christoph-sommer.de>")
@@ -618,6 +627,8 @@ if not, write to the Free Software Foundation, Inc.,
         """
         Event handler: Fires when user closes the frame
         """
+        if self.tray_icon:
+            self.tray_icon.Destroy()
         self.Destroy()
 
     def _on_searchbox_char(self, evt):
