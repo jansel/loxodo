@@ -185,6 +185,9 @@ class VaultFrame(wx.Frame):
         self._recordmenu.Append(temp_id, _("Copy &Password\tCtrl+P"))
         wx.EVT_MENU(self, temp_id, self._on_copy_password)
         temp_id = wx.NewId()
+        self._recordmenu.Append(temp_id, _("Copy URL\tCtrl+K"))
+        wx.EVT_MENU(self, temp_id, self._on_copy_url)
+        temp_id = wx.NewId()
         self._recordmenu.Append(temp_id, _("Open UR&L\tCtrl+L"))
         wx.EVT_MENU(self, temp_id, self._on_open_url)
         temp_id = wx.NewId()
@@ -601,6 +604,20 @@ if not, write to the Free Software Foundation, Inc.,
             self.statusbar.SetStatusText(_('Copied password of "%s" to clipboard') % entry.title, 0)
         except RuntimeError:
             self.statusbar.SetStatusText(_('Error copying password of "%s" to clipboard') % entry.title, 0)
+
+    def _on_copy_url(self, dummy):
+        """
+        Event handler: Fires when user chooses this menu item.
+        """
+        index = self.list.GetFirstSelected()
+        if index == -1:
+            return
+        entry = self.list.displayed_entries[index]
+        try:
+            self._copy_to_clipboard(entry.url)
+            self.statusbar.SetStatusText(_('Copied URL of "%s" to clipboard') % entry.title, 0)
+        except RuntimeError:
+            self.statusbar.SetStatusText(_('Error copying URL of "%s" to clipboard') % entry.title, 0)
 
     def _on_open_url(self, dummy):
         """
