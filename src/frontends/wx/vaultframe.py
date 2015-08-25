@@ -28,6 +28,7 @@ from .mergeframe import MergeFrame
 from .settings import Settings
 from .taskbaricon import LoxodoTaskBarIcon
 
+from .paths import get_resourcedir
 
 class VaultFrame(wx.Frame):
     """
@@ -248,6 +249,10 @@ class VaultFrame(wx.Frame):
             # Arrow keys, page up, etc -- let event propagate to default handler
             key_event.Skip()
             return
+        if key_event.HasModifiers():
+            # ctrl (eg Ctrl-U to copy username, Ctrl-P to copy password)
+            key_event.Skip()
+            return
         self._searchbox.SetFocus()
         self._searchbox.EmulateKeyPress(key_event)
 
@@ -383,7 +388,7 @@ if not, write to the Free Software Foundation, Inc.,
                       )
 
         about = wx.AboutDialogInfo()
-        about.SetIcon(self.icon)
+        about.SetIcon(wx.Icon(os.path.join(get_resourcedir(), "loxodo-icon.png"), wx.BITMAP_TYPE_PNG, 128, 128))
         about.SetName("Loxodo")
         about.SetVersion("0.0-git")
         about.SetCopyright("Copyright (C) 2008 Christoph Sommer <mail@christoph-sommer.de>")
