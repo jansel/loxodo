@@ -21,6 +21,7 @@ import os
 import wx
 import wx.adv
 import six
+import logging
 
 from .wxlocale import _
 from ...vault import Vault
@@ -30,6 +31,8 @@ from .mergeframe import MergeFrame
 from .settings import Settings
 
 from .paths import get_resourcedir
+
+logging.basicConfig(level=logging.INFO)
 
 class VaultFrame(wx.Frame):
     """
@@ -142,6 +145,7 @@ class VaultFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
+        self._clipboard_counter = 0
 
         self.Bind(wx.EVT_CLOSE, self._on_frame_close)
 
@@ -304,30 +308,30 @@ class VaultFrame(wx.Frame):
             dial.ShowModal()
             dial.Destroy()
 
-    def _clear_clipboard(self, match_text = None):
-        if match_text:
-            if not wx.TheClipboard.Open():
-                raise RuntimeError(_("Could not open clipboard"))
-            try:
-                clip_object = wx.TextDataObject()
-                if wx.TheClipboard.GetData(clip_object):
-                    if clip_object.GetText() != match_text:
-                        return
-            finally:
-                wx.TheClipboard.Close()
-        wx.TheClipboard.Clear()
-        self.statusbar.SetStatusText(_('Cleared clipboard'), 0)
-
-    def _copy_to_clipboard(self, text, duration = None):
-        if not wx.TheClipboard.Open():
-            raise RuntimeError(_("Could not open clipboard"))
+    def _clear_clipboard(self, match_text=None, clipboard_counter=None):
+        if clipboard_counter and clipboard_counter != self._clipboard_counter:
+            return
+        if match_text and _read_clipboard() != match_text:
+            return
         try:
-            clip_object = wx.TextDataObject(text)
-            wx.TheClipboard.SetData(clip_object)
+            _write_clipboard('')
+            self.statusbar.SetStatusText(_('Cleared clipboard'), 0)
+        except:
+            logging.exception('')
+            self.statusbar.SetStatusText(_('Error clearing clipboard'), 0)
+
+
+    def _copy_to_clipboard(self, text, duration=None):
+        self._clipboard_counter += 1
+        clipboard_counter = self._clipboard_counter
+
+        try:
+            _write_clipboard(text)
             if duration:
-                wx.CallLater(duration * 1000, self._clear_clipboard, text)
-        finally:
-            wx.TheClipboard.Close()
+                wx.CallLater(duration * 1000, self._clear_clipboard, text, clipboard_counter)
+        except:
+            logging.exception('Error in _copy_to_clipboard')
+            raise
 
     def _on_list_item_activated(self, event):
         """
@@ -663,4 +667,34 @@ if not, write to the Free Software Foundation, Inc.,
 
         # Ignore all other keys
         evt.Skip()
+
+
+try:
+    # wx.TheClipboard is very flakey in ubuntu 19.10, use this instead
+    import pyperclip
+    _write_clipboard = pyperclip.copy
+    _read_clipboard = pyperclip.paste
+
+except ImportError:
+    print('pyperclip not installed')
+
+    def _write_clipboard(text):
+        if not wx.TheClipboard.IsOpened() and not wx.TheClipboard.Open():
+            raise RuntimeError(_("Could not open clipboard"))
+
+        if text:
+            clip_object = wx.TextDataObject(text)
+            if not wx.TheClipboard.SetData(clip_object):
+                raise RuntimeError(_("Clipboard SetData failed"))
+        else:
+            wx.TheClipboard.Clear()
+
+
+    def _read_clipboard():
+        if not wx.TheClipboard.IsOpened() and not wx.TheClipboard.Open():
+            raise RuntimeError(_("Could not open clipboard"))
+        clip_object = wx.TextDataObject()
+        if wx.TheClipboard.GetData(clip_object):
+            return clip_object.GetText()
+
 
