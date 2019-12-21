@@ -19,7 +19,8 @@
 
 import os
 import platform
-from ConfigParser import SafeConfigParser
+import six
+from six.moves.configparser import SafeConfigParser
 
 
 class Config(object):
@@ -33,12 +34,12 @@ class Config(object):
         self._basescript = None
         self.recentvaults = []
         self.pwlength = 10
-        self.reduction = False
         self.search_notes = False
         self.search_passwd = False
-        self.use_pwgen = False
-        self.alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+        self.alphabet = "abcdefghikmnopqrstuvwxyz23456789ABCDEFGHJKLMNPQRSTUVWXYZ_"
+        self.avoid_bigrams = "cl mn nm nn rn vv VV"
         self.tray_icon = False
+        self.use_pwgen = False
 
         self._fname = self.get_config_filename()
         self._parser = SafeConfigParser()
@@ -53,9 +54,6 @@ class Config(object):
             if (not self._parser.has_option("base", "recentvaults" + str(num))):
                 break
             self.recentvaults.append(self._parser.get("base", "recentvaults" + str(num)))
-
-        if self._parser.has_option("base", "alphabet"):
-            self.alphabet = int(self._parser.get("base", "alphabet"))
 
         if self._parser.has_option("base", "pwlength"):
             self.pwlength = int(self._parser.get("base", "pwlength"))
@@ -80,6 +78,12 @@ class Config(object):
             if self._parser.get("base", "use_pwgen") == "True":
                 self.use_pwgen = True
 
+        if self._parser.has_option("base", "alphabet"):
+            self.alphabet = self._parser.get("base", "alphabet")
+
+        if self._parser.has_option("base", "avoid_bigrams"):
+            self.avoid_bigrams = self._parser.get("base", "avoid_bigrams")
+
         if not os.path.exists(self._fname):
             self.save()
 
@@ -103,11 +107,13 @@ class Config(object):
             if (len(_saved_recentvaults) >= 10):
                 break
 
-        self._parser.set("base", "pwlength", str(self.pwlength))
         self._parser.set("base", "alphabetreduction", str(self.reduction))
-        self._parser.set("base", "tray_icon", str(self.tray_icon))
+        self._parser.set("base", "alphabet", str(self.alphabet))
+        self._parser.set("base", "avoid_bigrams", str(self.avoid_bigrams))
+        self._parser.set("base", "pwlength", str(self.pwlength))
         self._parser.set("base", "search_notes", str(self.search_notes))
         self._parser.set("base", "search_passwd", str(self.search_passwd))
+        self._parser.set("base", "tray_icon", str(self.tray_icon))
         self._parser.set("base", "use_pwgen", str(self.use_pwgen))
         filehandle = open(self._fname, 'w')
         self._parser.write(filehandle)
