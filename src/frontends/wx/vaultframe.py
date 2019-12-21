@@ -260,11 +260,7 @@ class VaultFrame(wx.Frame):
             key_event.Skip()
             return
         self._searchbox.SetFocus()
-        if hasattr(self._searchbox, 'EmulateKeyPress'):
-            self._searchbox.EmulateKeyPress(key_event)
-        else:
-            # older version of wx
-            wx.UIActionSimulator().Char(key_event.GetKeyCode())
+        self._searchbox.EmulateKeyPress(key_event)
 
     def mark_modified(self):
         self._is_modified = True
