@@ -41,12 +41,8 @@ class RecordFrame(wx.Dialog):
 
         _sz_main = wx.BoxSizer(wx.VERTICAL)
         _sz_fields = wx.FlexGridSizer(cols=2, hgap=5, vgap=5)
-        # _sz_fields.AddGrowableCol(1)
-        # _sz_fields.AddGrowableRow(5)
-
         self._tc_title = self._add_a_textcontrol(_sz_fields, _("Title") + ":", "")
         self._tc_group = self._add_a_textcontrol(_sz_fields, _("Group") + ":", "")
-        self._tc_title = self._add_a_textcontrol(_sz_fields, _("Title") + ":", "")
         self._tc_user = self._add_a_textcontrol(_sz_fields, _("Username") + ":", "")
         (self._tc_passwd, self._tc_passwd_alt, self._bt_showhide) = self._add_a_passwdfield(_sz_fields, _("Password") + ":", "")
         self._tc_url = self._add_a_textcontrol(_sz_fields, _("URL") + ":", "")
@@ -198,13 +194,7 @@ class RecordFrame(wx.Dialog):
     def generate_password(alphabet="0123456789", pwd_length=8, avoid_bigrams="", use_pwgen=False):
         if use_pwgen:
             # use pwgen program to generate pronounceable passwords
-            options = '-cn'
-            if allow_reduction:
-                options += 'B'
-            stdout, stderr = subprocess.Popen(
-                    ['pwgen', options, str(pwd_length), '1'],
-                    stdout=subprocess.PIPE).communicate()
-            pwd = stdout.strip()
+            pwd = subprocess.check_output(['pwgen', '-cny', str(pwd_length), '1']).strip()
             assert len(pwd) == pwd_length
             return pwd
 

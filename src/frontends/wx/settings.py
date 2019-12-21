@@ -49,8 +49,6 @@ class Settings(wx.Dialog):
 
         _sz_main.Add(_sz_fields, 1, wx.EXPAND | wx.GROW)
 
-        self._cb_tray_icon = self._add_a_checkbox(_sz_fields,_("Tray Icon") + ":")
-
         try:
             # Throws exception of pwgen is not installed
             subprocess.Popen(['pwgen'], stdout=subprocess.PIPE).communicate()
@@ -129,7 +127,6 @@ class Settings(wx.Dialog):
             self._cb_pwgen.SetValue(config.use_pwgen)
         self._sc_length.SetValue(config.pwlength)
         self._tc_alphabet.SetValue(config.alphabet)
-        self._cb_tray_icon.SetValue(config.tray_icon)
         self._tc_avoid_bigrams.SetValue(config.avoid_bigrams)
         self._search_notes.SetValue(config.search_notes)
         self._search_passwd.SetValue(config.search_passwd)
@@ -144,7 +141,6 @@ class Settings(wx.Dialog):
         config.search_notes = self._search_notes.GetValue()
         config.search_passwd = self._search_passwd.GetValue()
         config.alphabet = self._tc_alphabet.GetValue()
-        config.tray_icon = self._cb_tray_icon.GetValue()
         config.avoid_bigrams = self._tc_avoid_bigrams.GetValue()
         config.save()
 
